@@ -301,8 +301,8 @@ func (ob *OrderBook) String() string {
 func (ob *OrderBook) Market() (bid, ask, mark decimal.Decimal, bidSize, askSize decimal.Decimal, bidParty, askParty string) {
 	askQueue := ob.asks.MinPriceQueue()
 	bidQueue := ob.bids.MaxPriceQueue()
-	_ = askQueue
-	_ = bidQueue
+	bid = bidQueue.Price()
+	ask = askQueue.Price()
 
 	return
 }
