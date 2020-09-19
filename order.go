@@ -1,26 +1,27 @@
 package orderbook
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
 )
 
-// Order strores information about request
+// Order stores a limit or market order
 type Order struct {
-	side      Side
-	id        string
-	timestamp time.Time
-	quantity  decimal.Decimal
-	price     decimal.Decimal
+	Party string          `json:"party"`
+	Side  Side            `json:"side"`
+	ID    string          `json:"id"`
+	Time  time.Time       `json:"timestamp"`
+	Qty   decimal.Decimal `json:"quantity"`
+	Price decimal.Decimal `json:"price"`
 }
 
+/*
 // NewOrder creates new constant object Order
-func NewOrder(orderID string, side Side, quantity, price decimal.Decimal, timestamp time.Time) *Order {
+func NewOrder(orderID string, party string, side Side, quantity, price decimal.Decimal, timestamp time.Time) *Order {
 	return &Order{
 		id:        orderID,
+		party:     party,
 		side:      side,
 		quantity:  quantity,
 		price:     price,
@@ -31,6 +32,11 @@ func NewOrder(orderID string, side Side, quantity, price decimal.Decimal, timest
 // ID returns orderID field copy
 func (o *Order) ID() string {
 	return o.id
+}
+
+// Side returns side of the order
+func (o *Order) Party() string {
+	return o.party
 }
 
 // Side returns side of the order
@@ -55,7 +61,7 @@ func (o *Order) Time() time.Time {
 
 // String implements Stringer interface
 func (o *Order) String() string {
-	return fmt.Sprintf("\n\"%s\":\n\tside: %s\n\tquantity: %s\n\tprice: %s\n\ttime: %s\n", o.ID(), o.Side(), o.Quantity(), o.Price(), o.Time())
+	return fmt.Sprintf("\n\"%s\":\n\tside: %s\n\tquantity: %s\n\tprice: %s\n\ttime: %s\n", o.ID(), o.Side(), o.Quantity, o.Price, o.Time())
 }
 
 // MarshalJSON implements json.Marshaler interface
@@ -72,7 +78,7 @@ func (o *Order) MarshalJSON() ([]byte, error) {
 			ID:        o.ID(),
 			Timestamp: o.Time(),
 			Quantity:  o.Quantity(),
-			Price:     o.Price(),
+			Price:     o.Price,
 		},
 	)
 }
@@ -98,3 +104,4 @@ func (o *Order) UnmarshalJSON(data []byte) error {
 	o.price = obj.Price
 	return nil
 }
+*/

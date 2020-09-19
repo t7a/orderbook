@@ -16,7 +16,7 @@ type OrderSide struct {
 	priceTree *rbtx.RedBlackTreeExtended
 	prices    map[string]*OrderQueue
 
-	volume    decimal.Decimal
+	volume    decimal.Decimal // XXX should be called "size"
 	numOrders int
 	depth     int
 }
@@ -53,24 +53,24 @@ func (os *OrderSide) Volume() decimal.Decimal {
 
 // Append appends order to definite price level
 func (os *OrderSide) Append(o *Order) *list.Element {
-	price := o.Price()
+	price := o.Price
 	strPrice := price.String()
 
 	priceQueue, ok := os.prices[strPrice]
 	if !ok {
-		priceQueue = NewOrderQueue(o.Price())
+		priceQueue = NewOrderQueue(o.Price)
 		os.prices[strPrice] = priceQueue
 		os.priceTree.Put(price, priceQueue)
 		os.depth++
 	}
 	os.numOrders++
-	os.volume = os.volume.Add(o.Quantity())
+	os.volume = os.volume.Add(o.Qty)
 	return priceQueue.Append(o)
 }
 
 // Remove removes order from definite price level
 func (os *OrderSide) Remove(e *list.Element) *Order {
-	price := e.Value.(*Order).Price()
+	price := e.Value.(*Order).Price
 	strPrice := price.String()
 
 	priceQueue := os.prices[strPrice]
@@ -83,11 +83,11 @@ func (os *OrderSide) Remove(e *list.Element) *Order {
 	}
 
 	os.numOrders--
-	os.volume = os.volume.Sub(o.Quantity())
+	os.volume = os.volume.Sub(o.Qty)
 	return o
 }
 
-// MaxPriceQueue returns maximal level of price
+// MaxPriceQueue returns the queue containing the maxiumum price
 func (os *OrderSide) MaxPriceQueue() *OrderQueue {
 	if os.depth > 0 {
 		if value, found := os.priceTree.GetMax(); found {
@@ -97,7 +97,7 @@ func (os *OrderSide) MaxPriceQueue() *OrderQueue {
 	return nil
 }
 
-// MinPriceQueue returns maximal level of price
+// MinPriceQueue returns the queue containing the minimum price
 func (os *OrderSide) MinPriceQueue() *OrderQueue {
 	if os.depth > 0 {
 		if value, found := os.priceTree.GetMin(); found {

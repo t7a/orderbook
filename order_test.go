@@ -8,7 +8,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func NewOrder(oid string, side Side, qty decimal.Decimal, price decimal.Decimal, t time.Time) (o *Order) {
+	o = &Order{
+		Party: "test",
+		ID:    oid,
+		Side:  side,
+		Qty:   qty,
+		Price: price,
+		Time:  t,
+	}
+	return
+}
+
 func TestNewOrder(t *testing.T) {
+
 	t.Log(NewOrder("order-1", Sell, decimal.New(100, 0), decimal.New(100, 0), time.Now().UTC()))
 }
 

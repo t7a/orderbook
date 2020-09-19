@@ -52,21 +52,21 @@ func (oq *OrderQueue) Tail() *list.Element {
 
 // Append adds order to tail of the queue
 func (oq *OrderQueue) Append(o *Order) *list.Element {
-	oq.volume = oq.volume.Add(o.Quantity())
+	oq.volume = oq.volume.Add(o.Qty)
 	return oq.orders.PushBack(o)
 }
 
 // Update sets up new order to list value
 func (oq *OrderQueue) Update(e *list.Element, o *Order) *list.Element {
-	oq.volume = oq.volume.Sub(e.Value.(*Order).Quantity())
-	oq.volume = oq.volume.Add(o.Quantity())
+	oq.volume = oq.volume.Sub(e.Value.(*Order).Qty)
+	oq.volume = oq.volume.Add(o.Qty)
 	e.Value = o
 	return e
 }
 
 // Remove removes order from the queue and link order chain
 func (oq *OrderQueue) Remove(e *list.Element) *Order {
-	oq.volume = oq.volume.Sub(e.Value.(*Order).Quantity())
+	oq.volume = oq.volume.Sub(e.Value.(*Order).Qty)
 	return oq.orders.Remove(e).(*Order)
 }
 
@@ -77,7 +77,7 @@ func (oq *OrderQueue) String() string {
 	sb.WriteString(fmt.Sprintf("\nqueue length: %d, price: %s, volume: %s, orders:", oq.Len(), oq.Price(), oq.Volume()))
 	for iter != nil {
 		order := iter.Value.(*Order)
-		str := fmt.Sprintf("\n\tid: %s, volume: %s, time: %s", order.ID(), order.Quantity(), order.Price())
+		str := fmt.Sprintf("\n\tid: %s, volume: %s, time: %s", order.ID, order.Qty, order.Price)
 		sb.WriteString(str)
 		iter = iter.Next()
 	}
