@@ -297,13 +297,23 @@ func (ob *OrderBook) String() string {
 	return ob.asks.String() + "\r\n------------------------------------" + ob.bids.String()
 }
 
-// Market returns the inside bid and ask along with related data.
-func (ob *OrderBook) Market() (bid, ask, mark decimal.Decimal, bidSize, askSize decimal.Decimal, bidParty, askParty string) {
+// Market returns the inside bid and ask along with related data.  The
+// values returned are pointers; if e.g. there is no ask order in the
+// book, then ask and askSize will be nil pointers.
+func (ob *OrderBook) Market() (bid, ask, mark, bidSize, askSize *decimal.Decimal, bidParty, askParty string) {
+	ptr := func(in decimal.Decimal) (out *decimal.Decimal) { return &in }
+
 	askQueue := ob.asks.MinPriceQueue()
 	bidQueue := ob.bids.MaxPriceQueue()
-	bid = bidQueue.Price()
-	ask = askQueue.Price()
-
+	if bidQueue != nil {
+		bid = ptr(bidQueue.Price())
+	}
+	if askQueue != nil {
+		ask = ptr(askQueue.Price())
+	}
+	if bid != nil && ask != nil {
+		mark = ptr(bid.Add(*ask).Mul(decimal.NewFromFloat(0.5)))
+	}
 	return
 }
 
