@@ -11,7 +11,7 @@ import (
 
 // OrderQueue stores and manage chain of orders
 type OrderQueue struct {
-	volume decimal.Decimal
+	volume decimal.Decimal //XXX volume should be called size
 	price  decimal.Decimal
 	orders *list.List
 }
@@ -37,6 +37,9 @@ func (oq *OrderQueue) Price() decimal.Decimal {
 
 // Volume returns total orders volume
 func (oq *OrderQueue) Volume() decimal.Decimal {
+	// XXX this should have a dirty bit associated with it, so it is only a cache;
+	// XXX so then we would sum up only when the bit is set.  The bit would be set
+	// XXX on any change to the linked list.
 	return oq.volume
 }
 

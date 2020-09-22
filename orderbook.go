@@ -3,6 +3,7 @@ package orderbook
 import (
 	"container/list"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -186,7 +187,7 @@ func (ob *OrderBook) processQueue(party string, orderQueue *OrderQueue, quantity
 
 		if quantityLeft.LessThan(headOrder.Qty) {
 			o := &Order{
-				Party: party,
+				Party: headOrder.Party,
 				ID:    headOrder.ID,
 				Side:  headOrder.Side,
 				Qty:   headOrder.Qty.Sub(quantityLeft),
@@ -303,17 +304,30 @@ func (ob *OrderBook) String() string {
 func (ob *OrderBook) Market() (bid, ask, mark, bidSize, askSize *decimal.Decimal, bidParty, askParty string) {
 	ptr := func(in decimal.Decimal) (out *decimal.Decimal) { return &in }
 
-	askQueue := ob.asks.MinPriceQueue()
 	bidQueue := ob.bids.MaxPriceQueue()
+	askQueue := ob.asks.MinPriceQueue()
 	if bidQueue != nil {
 		bid = ptr(bidQueue.Price())
+		bidSize = ptr(bidQueue.Volume())
+		bidParty = bidQueue.Head().Value.(*Order).Party
+		if bidQueue.Len() > 1 {
+			bidParty += fmt.Sprintf(" +%d", bidQueue.Len()-1)
+		}
 	}
 	if askQueue != nil {
 		ask = ptr(askQueue.Price())
+		askSize = ptr(askQueue.Volume())
+		askParty = askQueue.Head().Value.(*Order).Party
+		if askQueue.Len() > 1 {
+			askParty += fmt.Sprintf(" +%d", askQueue.Len()-1)
+		}
 	}
 	if bid != nil && ask != nil {
 		mark = ptr(bid.Add(*ask).Mul(decimal.NewFromFloat(0.5)))
 	}
+
+	// fmt.Printf("bid %s ask %s\n", bidQueue, askParty)
+
 	return
 }
 
